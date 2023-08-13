@@ -1,6 +1,8 @@
 package com.example.yelp.Controller;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -77,5 +79,16 @@ public class YelpSearchResponse {
         this.region = response.region;
         this.total = response.total;
         System.out.println("Business List: " + businesses);
+    }
+
+    /**re-rank the business by new ranking = rating * review_count, in desc order*/
+    public void reRank() {
+        Collections.sort(this.businesses, (o1, o2) -> {
+            double newRank1 = o1.rating * o1.review_count;
+            double newRank2 = o2.rating * o2.review_count;
+            if (newRank2 > newRank1) return 1;
+            else if (newRank2 == newRank1) return 0;
+            else return -1;
+        });
     }
 }

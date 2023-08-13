@@ -7,6 +7,7 @@ import org.springframework.objenesis.ObjenesisException;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpHeaders;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -56,7 +57,8 @@ public class YelpController {
         httpGet.setHeader("Authorization", "Bearer e-IlGlkWFigEJsWMpi_BkXU88_ha9bbuoxT3Bqv_MN2kDDotNtv2mcpBYccl9DzyL1xBh65LpF9yHzLGi4eWbt48N7TTq2q0prZqkZXio7Ctn5dQ_vUHWSAzfOPYZHYx");
         httpGet.setHeader("accept", "application/json");
 
-        YelpSearchResponse yelpSearchResponse;
+        YelpSearchResponse yelpSearchResponse = new YelpSearchResponse();
+        int statusCode = 500;
 
         try (CloseableHttpResponse response = httpClient.execute(httpGet)) {
             HttpEntity entity = response.getEntity();
@@ -65,15 +67,15 @@ public class YelpController {
                 System.out.println(result);
                 yelpSearchResponse = new YelpSearchResponse(result);
             }
-            else {
-                yelpSearchResponse = new YelpSearchResponse();
-            }
+            statusCode = response.getStatusLine().getStatusCode();
+            System.out.println("statusCode: " + statusCode);
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        return new ResponseEntity<YelpSearchResponse>(HttpStatus.OK);
-    }
+        yelpSearchResponse.reRank();
 
+        return new ResponseEntity<YelpSearchResponse>(yelpSearchResponse, HttpStatus.valueOf(statusCode));
+    }
 }
 
