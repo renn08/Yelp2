@@ -1,9 +1,7 @@
 package com.example.yelp.Controller;
 
-import com.example.yelp.Entity.SearchRerankRequest;
-import com.example.yelp.Entity.SearchRerankServiceResponse;
+import com.example.yelp.Entity.*;
 
-import com.example.yelp.Entity.YelpSearchResponse;
 import org.apache.http.client.methods.*;
 import org.apache.juli.logging.LogFactory;
 import org.slf4j.Logger;
@@ -62,7 +60,22 @@ public class YelpController {
 
         SearchRerankServiceResponse serviceResponse = new SearchRerankServiceResponse(yelpSearchResponse, request);
 
-        return new ResponseEntity<SearchRerankServiceResponse>(serviceResponse, serviceResponse.getStatusCode());
+        return new ResponseEntity<>(serviceResponse, yelpSearchResponse.getStatusCode());
+    }
+
+
+    @GetMapping("/searchGroupByCategory")
+    public ResponseEntity<SearchGroupByCategoryServiceResponse> SearchGroupByCategoryResult(@RequestParam String location,
+                                                                          @RequestParam(required = false) String term
+    ) {
+        SearchGroupByCategoryRequest request = new SearchGroupByCategoryRequest(location, term);
+        HttpUriRequest httpRequest = request.generateRequest();
+
+        YelpSearchResponse yelpSearchResponse = getYelpResponse(httpRequest);
+
+        SearchGroupByCategoryServiceResponse serviceResponse = new SearchGroupByCategoryServiceResponse(yelpSearchResponse, request);
+
+        return new ResponseEntity<>(serviceResponse, yelpSearchResponse.getStatusCode());
     }
 }
 

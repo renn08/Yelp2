@@ -2,7 +2,6 @@ package com.example.yelp.Entity;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 
 import java.util.ArrayList;
@@ -12,12 +11,12 @@ import java.util.List;
 public class SearchRerankServiceResponse {
     Logger logger = LoggerFactory.getLogger(SearchRerankServiceResponse.class);
 
-    private HttpStatusCode statusCode;
+    protected HttpStatusCode statusCode;
     private int total;
     private Region region;
-    private String searchLocation;
-    private String searchTerm;
-    private List<Business> businesses = new ArrayList<>();
+    protected String searchLocation;
+    protected String searchTerm;
+    protected List<Business> businesses = new ArrayList<>();
 
     public SearchRerankServiceResponse() {}
     public SearchRerankServiceResponse(YelpSearchResponse yelpSearchResponse, SearchRerankRequest request) {
