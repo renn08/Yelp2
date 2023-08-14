@@ -8,8 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import java.net.URLEncoder;
 
-public class SearchRerankRequest {
-    private static final String API_KEY = "e-IlGlkWFigEJsWMpi_BkXU88_ha9bbuoxT3Bqv_MN2kDDotNtv2mcpBYccl9DzyL1xBh65LpF9yHzLGi4eWbt48N7TTq2q0prZqkZXio7Ctn5dQ_vUHWSAzfOPYZHYx";
+public class SearchRerankRequest extends SampleRequest {
     Logger logger = LoggerFactory.getLogger(SearchRerankRequest.class);
     private String location;
     private String term;

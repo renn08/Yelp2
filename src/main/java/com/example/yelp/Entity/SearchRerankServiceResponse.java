@@ -26,7 +26,6 @@ public class SearchRerankServiceResponse {
         this.searchLocation = request.getLocation();
         this.searchTerm = request.getTerm();
         this.statusCode = yelpSearchResponse.getStatusCode();
-        this.reRank();
     }
 
     public HttpStatusCode getStatusCode() {

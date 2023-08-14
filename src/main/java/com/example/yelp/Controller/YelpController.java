@@ -29,6 +29,35 @@ public class YelpController {
         return "Greetings from Spring Boot!";
     }
 
+    @GetMapping("/searchRerank")
+    public ResponseEntity<SearchRerankServiceResponse> rerankSearchResult(@RequestParam String location,
+                                                                          @RequestParam(required = false) String term
+    ) {
+        SearchRerankRequest request = new SearchRerankRequest(location, term);
+        HttpUriRequest httpRequest = request.generateRequest();
+
+        YelpSearchResponse yelpSearchResponse = getYelpResponse(httpRequest);
+
+        SearchRerankServiceResponse serviceResponse = new SearchRerankServiceResponse(yelpSearchResponse, request);
+        serviceResponse.reRank();
+
+        return new ResponseEntity<>(serviceResponse, yelpSearchResponse.getStatusCode());
+    }
+
+    @GetMapping("/searchGroupByCategory")
+    public ResponseEntity<SearchGroupByCategoryServiceResponse> SearchGroupByCategoryResult(@RequestParam String location,
+                                                                          @RequestParam(required = false) String term
+    ) {
+        SearchGroupByCategoryRequest request = new SearchGroupByCategoryRequest(location, term);
+        HttpUriRequest httpRequest = request.generateRequest();
+
+        YelpSearchResponse yelpSearchResponse = getYelpResponse(httpRequest);
+
+        SearchGroupByCategoryServiceResponse serviceResponse = new SearchGroupByCategoryServiceResponse(yelpSearchResponse, request);
+
+        return new ResponseEntity<>(serviceResponse, yelpSearchResponse.getStatusCode());
+    }
+
     private YelpSearchResponse getYelpResponse(HttpUriRequest httpRequest) {
 
         CloseableHttpClient httpClient = HttpClients.createDefault();
@@ -47,35 +76,6 @@ public class YelpController {
         }
 
         return yelpSearchResponse;
-    }
-
-    @GetMapping("/searchRerank")
-    public ResponseEntity<SearchRerankServiceResponse> rerankSearchResult(@RequestParam String location,
-                                                                          @RequestParam(required = false) String term
-    ) {
-        SearchRerankRequest request = new SearchRerankRequest(location, term);
-        HttpUriRequest httpRequest = request.generateRequest();
-
-        YelpSearchResponse yelpSearchResponse = getYelpResponse(httpRequest);
-
-        SearchRerankServiceResponse serviceResponse = new SearchRerankServiceResponse(yelpSearchResponse, request);
-
-        return new ResponseEntity<>(serviceResponse, yelpSearchResponse.getStatusCode());
-    }
-
-
-    @GetMapping("/searchGroupByCategory")
-    public ResponseEntity<SearchGroupByCategoryServiceResponse> SearchGroupByCategoryResult(@RequestParam String location,
-                                                                          @RequestParam(required = false) String term
-    ) {
-        SearchGroupByCategoryRequest request = new SearchGroupByCategoryRequest(location, term);
-        HttpUriRequest httpRequest = request.generateRequest();
-
-        YelpSearchResponse yelpSearchResponse = getYelpResponse(httpRequest);
-
-        SearchGroupByCategoryServiceResponse serviceResponse = new SearchGroupByCategoryServiceResponse(yelpSearchResponse, request);
-
-        return new ResponseEntity<>(serviceResponse, yelpSearchResponse.getStatusCode());
     }
 }
 
