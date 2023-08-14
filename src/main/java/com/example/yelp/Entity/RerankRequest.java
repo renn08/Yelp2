@@ -1,21 +1,18 @@
 package com.example.yelp.Entity;
 
-import java.net.URLEncoder;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.RequestBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.URLEncoder;
-
-public class SearchRerankRequest extends SampleRequest {
-    Logger logger = LoggerFactory.getLogger(SearchRerankRequest.class);
+public class RerankRequest extends SampleRequest {
+    Logger logger = LoggerFactory.getLogger(RerankRequest.class);
     private String location;
     private String term;
     private String locationEncoded;
     private String termEncoded;
 
-    public SearchRerankRequest(String location, String term) {
+    public RerankRequest(String location, String term) {
         this.location = location;
         this.term = term;
         this.locationEncoded = encode(location);

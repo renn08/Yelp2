@@ -7,8 +7,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class SearchRerankResponse extends SampleResponse {
-    Logger logger = LoggerFactory.getLogger(SearchRerankResponse.class);
+public class RerankResponse extends SampleResponse {
+    Logger logger = LoggerFactory.getLogger(RerankResponse.class);
 
     private int total;
     private Region region;
@@ -16,8 +16,7 @@ public class SearchRerankResponse extends SampleResponse {
     private String searchTerm;
     private List<Business> businesses = new ArrayList<>();
 
-    public SearchRerankResponse() {}
-    public SearchRerankResponse(YelpSearchResponse yelpSearchResponse, SearchRerankRequest request) {
+    public RerankResponse(YelpSearchResponse yelpSearchResponse, RerankRequest request) {
         super(yelpSearchResponse);
         this.businesses = yelpSearchResponse.getBusinesses();
         this.region = yelpSearchResponse.getRegion();

@@ -38,12 +38,15 @@ public class Category {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Category category = (Category) o;
-        return Objects.equals(alias, category.alias) &&
-                Objects.equals(title, category.title);
+        return
+//                Objects.equals(title, category.title) && //TODO: not sure can we just use alias to do hash and equals
+                Objects.equals(alias, category.alias);
+
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(alias, title);
+//        return Objects.hash(alias, title);
+        return Objects.hash(alias);
     }
 }
