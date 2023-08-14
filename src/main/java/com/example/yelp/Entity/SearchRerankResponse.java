@@ -2,38 +2,28 @@ package com.example.yelp.Entity;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatusCode;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class SearchRerankServiceResponse {
-    Logger logger = LoggerFactory.getLogger(SearchRerankServiceResponse.class);
+public class SearchRerankResponse extends SampleResponse {
+    Logger logger = LoggerFactory.getLogger(SearchRerankResponse.class);
 
-    protected HttpStatusCode statusCode;
     private int total;
     private Region region;
-    protected String searchLocation;
-    protected String searchTerm;
-    protected List<Business> businesses = new ArrayList<>();
+    private String searchLocation;
+    private String searchTerm;
+    private List<Business> businesses = new ArrayList<>();
 
-    public SearchRerankServiceResponse() {}
-    public SearchRerankServiceResponse(YelpSearchResponse yelpSearchResponse, SearchRerankRequest request) {
+    public SearchRerankResponse() {}
+    public SearchRerankResponse(YelpSearchResponse yelpSearchResponse, SearchRerankRequest request) {
+        super(yelpSearchResponse);
         this.businesses = yelpSearchResponse.getBusinesses();
         this.region = yelpSearchResponse.getRegion();
         this.total = yelpSearchResponse.getTotal();
-        this.searchLocation = request.getLocation();
-        this.searchTerm = request.getTerm();
-        this.statusCode = yelpSearchResponse.getStatusCode();
-    }
-
-    public HttpStatusCode getStatusCode() {
-        return statusCode;
-    }
-
-    public void setStatusCode(HttpStatusCode statusCode) {
-        this.statusCode = statusCode;
+        this.searchLocation = request.getLocationEncoded();
+        this.searchTerm = request.getTermEncoded();
     }
 
     public int getTotal() {

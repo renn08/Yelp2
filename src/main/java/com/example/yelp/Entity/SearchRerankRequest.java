@@ -18,35 +18,38 @@ public class SearchRerankRequest extends SampleRequest {
     public SearchRerankRequest(String location, String term) {
         this.location = location;
         this.term = term;
-        encode();
+        this.locationEncoded = encode(location);
+        this.termEncoded = encode(term);
     }
 
-    private void encode() {
-        try {
-            locationEncoded = URLEncoder.encode(location, "UTF-8");
-            logger.info("loationEncoded: " + locationEncoded);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        try {
-            termEncoded = URLEncoder.encode(term, "UTF-8");
-            logger.info("termEncoded: " + termEncoded);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    private String generateUrl() {
+    @Override
+    protected String generateUrl() {
         return String.format("https://api.yelp.com/v3/businesses/search?location=%s&term=%s", locationEncoded, termEncoded);
     }
 
+    @Override
     public HttpUriRequest generateRequest() {
         return RequestBuilder.get()
                 .setUri(generateUrl())
                 .addHeader("accept", "application/json")
                 .addHeader("Authorization", "Bearer " + API_KEY)
                 .build();
+    }
+
+    public String getLocationEncoded() {
+        return locationEncoded;
+    }
+
+    public void setLocationEncoded(String locationEncoded) {
+        this.locationEncoded = locationEncoded;
+    }
+
+    public String getTermEncoded() {
+        return termEncoded;
+    }
+
+    public void setTermEncoded(String termEncoded) {
+        this.termEncoded = termEncoded;
     }
 
     public String getLocation() {

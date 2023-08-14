@@ -1,5 +1,7 @@
 package com.example.yelp.Entity;
 
+import java.util.Objects;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Category {
@@ -29,5 +31,19 @@ public class Category {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Category category = (Category) o;
+        return Objects.equals(alias, category.alias) &&
+                Objects.equals(title, category.title);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(alias, title);
     }
 }

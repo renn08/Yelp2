@@ -3,14 +3,11 @@ package com.example.yelp.Controller;
 import com.example.yelp.Entity.*;
 
 import org.apache.http.client.methods.*;
-import org.apache.juli.logging.LogFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -30,30 +27,30 @@ public class YelpController {
     }
 
     @GetMapping("/searchRerank")
-    public ResponseEntity<SearchRerankServiceResponse> rerankSearchResult(@RequestParam String location,
-                                                                          @RequestParam(required = false) String term
+    public ResponseEntity<SearchRerankResponse> rerankSearchResult(@RequestParam String location,
+                                                                   @RequestParam(required = false) String term
     ) {
         SearchRerankRequest request = new SearchRerankRequest(location, term);
         HttpUriRequest httpRequest = request.generateRequest();
 
         YelpSearchResponse yelpSearchResponse = getYelpResponse(httpRequest);
 
-        SearchRerankServiceResponse serviceResponse = new SearchRerankServiceResponse(yelpSearchResponse, request);
+        SearchRerankResponse serviceResponse = new SearchRerankResponse(yelpSearchResponse, request);
         serviceResponse.reRank();
 
         return new ResponseEntity<>(serviceResponse, yelpSearchResponse.getStatusCode());
     }
 
     @GetMapping("/searchGroupByCategory")
-    public ResponseEntity<SearchGroupByCategoryServiceResponse> SearchGroupByCategoryResult(@RequestParam String location,
-                                                                          @RequestParam(required = false) String term
+    public ResponseEntity<GroupByCategoryResponse> SearchGroupByCategoryResult(@RequestParam String location,
+                                                                               @RequestParam(required = false) String term
     ) {
-        SearchGroupByCategoryRequest request = new SearchGroupByCategoryRequest(location, term);
+        GroupByCategoryRequest request = new GroupByCategoryRequest(location, term);
         HttpUriRequest httpRequest = request.generateRequest();
 
         YelpSearchResponse yelpSearchResponse = getYelpResponse(httpRequest);
 
-        SearchGroupByCategoryServiceResponse serviceResponse = new SearchGroupByCategoryServiceResponse(yelpSearchResponse, request);
+        GroupByCategoryResponse serviceResponse = new GroupByCategoryResponse(yelpSearchResponse, request);
 
         return new ResponseEntity<>(serviceResponse, yelpSearchResponse.getStatusCode());
     }
