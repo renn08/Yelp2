@@ -1,4 +1,4 @@
-package com.example.yelp.Entity;
+package com.example.yelp.Response;
 
 import org.springframework.http.HttpStatusCode;
 

@@ -1,7 +1,11 @@
 package com.example.yelp.Controller;
 
-import com.example.yelp.Entity.*;
-
+import com.example.yelp.Request.RerankFilterLocationCategoryRequest;
+import com.example.yelp.Request.RerankRequest;
+import com.example.yelp.Response.GroupByCategoryResponse;
+import com.example.yelp.Response.RerankFilterLocationCategoryResponse;
+import com.example.yelp.Response.RerankResponse;
+import com.example.yelp.Response.YelpSearchResponse;
 import org.apache.http.client.methods.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,41 +31,47 @@ public class YelpController {
     }
 
     @GetMapping("/searchRerank")
-    public ResponseEntity<SampleResponse> rerank(@RequestParam String location,
+    public ResponseEntity<RerankResponse> rerank(@RequestParam String location,
                                                  @RequestParam String term) {
         RerankRequest request = new RerankRequest(location, term);
 
         YelpSearchResponse yelpSearchResponse = getYelpResponse(request.generateRequest());
 
         RerankResponse serviceResponse = new RerankResponse(yelpSearchResponse, request);
+
         serviceResponse.reRank();
 
-        return new ResponseEntity<>(serviceResponse, yelpSearchResponse.getStatusCode());
+        // SampleResponse still has status code from Yelp API but for our service, default use .ok()
+        return ResponseEntity.ok().body(serviceResponse);
     }
 
     @GetMapping("/searchGroupByCategory")
-    public ResponseEntity<SampleResponse> GroupByCategory(@RequestParam String location,
-                                                          @RequestParam String term) {
-        GroupByCategoryRequest request = new GroupByCategoryRequest(location, term);
+    public ResponseEntity<GroupByCategoryResponse> GroupByCategory(@RequestParam String location,
+                                                                   @RequestParam String term) {
+        RerankRequest request = new RerankRequest(location, term);
 
         YelpSearchResponse yelpSearchResponse = getYelpResponse(request.generateRequest());
 
         GroupByCategoryResponse serviceResponse = new GroupByCategoryResponse(yelpSearchResponse, request);
 
-        return new ResponseEntity<>(serviceResponse, yelpSearchResponse.getStatusCode());
+        serviceResponse.groupByCategoryAndAddTotal();
+        serviceResponse.sortByTotal();
+
+        return ResponseEntity.ok().body(serviceResponse);
     }
 
     @GetMapping("/searchRerankFilterLocationCategory")
-    public ResponseEntity<SampleResponse> rerankFilterLocationCategory(@RequestParam String location,
-                                                                       @RequestParam String categories) {
+    public ResponseEntity<RerankFilterLocationCategoryResponse> rerankFilterLocationCategory(@RequestParam String location,
+                                                                                             @RequestParam String categories) {
         RerankFilterLocationCategoryRequest request = new RerankFilterLocationCategoryRequest(location, categories);
 
         YelpSearchResponse yelpSearchResponse = getYelpResponse(request.generateRequest());
 
         RerankFilterLocationCategoryResponse serviceResponse = new RerankFilterLocationCategoryResponse(yelpSearchResponse, request);
+
         serviceResponse.reRank();
 
-        return new ResponseEntity<>(serviceResponse, yelpSearchResponse.getStatusCode());
+        return ResponseEntity.ok().body(serviceResponse);
     }
 
     private YelpSearchResponse getYelpResponse(HttpUriRequest httpRequest) {
@@ -76,6 +86,8 @@ public class YelpController {
                 String result = EntityUtils.toString(entity);
                 yelpSearchResponse = new YelpSearchResponse(result);
             }
+            // now still has status code in the raw response body, but will not be used as our service response status
+            // code, default use .ok(). builder pattern
             yelpSearchResponse.setStatusCode(HttpStatusCode.valueOf(response.getStatusLine().getStatusCode()));
         } catch (Exception e) {
             e.printStackTrace();

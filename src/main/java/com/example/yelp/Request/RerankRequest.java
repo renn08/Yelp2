@@ -1,4 +1,4 @@
-package com.example.yelp.Entity;
+package com.example.yelp.Request;
 
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.RequestBuilder;
@@ -9,7 +9,7 @@ public class RerankRequest extends SampleRequest {
     Logger logger = LoggerFactory.getLogger(RerankRequest.class);
     private String location;
     private String term;
-    private String locationEncoded;
+    private String locationEncoded; // TODO: put in the getURL method remove other place
     private String termEncoded;
 
     public RerankRequest(String location, String term) {

@@ -1,8 +1,10 @@
-package com.example.yelp.Entity;
+package com.example.yelp.Response;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import com.example.yelp.Entity.Business;
+import com.example.yelp.Entity.Region;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

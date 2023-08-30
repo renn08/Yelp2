@@ -1,5 +1,8 @@
-package com.example.yelp.Entity;
+package com.example.yelp.Response;
 
+import com.example.yelp.Entity.Business;
+import com.example.yelp.Entity.Region;
+import com.example.yelp.Request.RerankRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

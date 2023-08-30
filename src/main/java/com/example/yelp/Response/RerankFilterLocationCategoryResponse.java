@@ -1,4 +1,6 @@
-package com.example.yelp.Entity;
+package com.example.yelp.Response;
+
+import com.example.yelp.Request.RerankFilterLocationCategoryRequest;
 
 public class RerankFilterLocationCategoryResponse extends RerankResponse {
     private String searchCategory;

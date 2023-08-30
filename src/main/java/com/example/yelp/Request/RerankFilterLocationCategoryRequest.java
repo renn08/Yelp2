@@ -1,7 +1,4 @@
-package com.example.yelp.Entity;
-
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.client.methods.RequestBuilder;
+package com.example.yelp.Request;
 
 public class RerankFilterLocationCategoryRequest extends RerankRequest {
     private String category;

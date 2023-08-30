@@ -1,4 +1,4 @@
-package com.example.yelp.Entity;
+package com.example.yelp.Request;
 
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.RequestBuilder;
@@ -28,5 +28,5 @@ public class SampleRequest {
 
     public HttpUriRequest generateRequest() {
         return null;
-    }
+    }//TODO: generateGetRequest() etc.
 }
