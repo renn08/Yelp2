@@ -1,33 +1,54 @@
 package com.example.yelp.Request;
 
-public class RerankFilterLocationCategoryRequest extends RerankRequest {
-    private String category;
-    private String categoryEncoded;
+import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.client.methods.RequestBuilder;
 
-    public RerankFilterLocationCategoryRequest(String location, String category) {
-        super(location, "");
-        this.category = category;
-        this.categoryEncoded = encode(category);
+public class RerankFilterLocationCategoryRequest extends SampleRequest {
+    private final String category;
+
+    private final String location;
+
+    private RerankFilterLocationCategoryRequest(Builder builder) {
+        super();
+        this.location = builder.location;
+        this.category = builder.category;
     }
 
     @Override
     protected String generateUrl() {
-        return String.format("https://api.yelp.com/v3/businesses/search?location=%s&categories=%s", this.getLocationEncoded(), this.categoryEncoded);
+        return String.format("https://api.yelp.com/v3/businesses/search?location=%s&categories=%s", encode(this.location), encode(this.category));
+    }
+
+    @Override
+    public HttpUriRequest generateRequest() {
+        return RequestBuilder.get()
+                .setUri(generateUrl())
+                .addHeader("accept", "application/json")
+                .addHeader("Authorization", "Bearer " + API_KEY)
+                .build();
     }
 
     public String getCategory() {
         return category;
     }
 
-    public void setCategory(String category) {
-        this.category = category;
+    public String getLocation() {
+        return location;
     }
 
-    public String getCategoryEncoded() {
-        return categoryEncoded;
-    }
+    public static class Builder extends SampleRequest.Builder {
+        private final String location;
+        private final String category;
 
-    public void setCategoryEncoded(String categoryEncoded) {
-        this.categoryEncoded = categoryEncoded;
+        public Builder(String location, String category) {
+            this.location = location;
+            this.category = category;
+        }
+
+        @Override
+        public RerankFilterLocationCategoryRequest build() {
+            RerankFilterLocationCategoryRequest rerankFilterLocationCategoryRequest = new RerankFilterLocationCategoryRequest(this);
+            return rerankFilterLocationCategoryRequest;
+        }
     }
 }

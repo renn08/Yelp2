@@ -22,12 +22,13 @@ public class GroupByCategoryResponse extends SampleResponse {
 
     private List<Business> businesses;
 
-    private List<Map<String, BusinessesAndTotal>> businessesAndTotalGroupByCategoryList;//TODO: just category.alias not the whole class
+    // category alias name for the String in the map
+    private List<Map<String, BusinessesAndTotal>> businessesAndTotalGroupByCategoryList;
 
     public GroupByCategoryResponse(YelpSearchResponse yelpSearchResponse, RerankRequest request) {
         super(yelpSearchResponse);
-        this.searchLocation = request.getLocationEncoded();
-        this.searchTerm = request.getTermEncoded();
+        this.searchLocation = request.encode(request.getLocation());
+        this.searchTerm = request.encode(request.getTerm());
         this.businessesAndTotalGroupByCategoryList = new ArrayList<>();
         this.businesses = new ArrayList<>();
         this.businesses = yelpSearchResponse.getBusinesses();

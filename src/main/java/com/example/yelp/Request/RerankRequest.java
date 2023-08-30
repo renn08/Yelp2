@@ -7,21 +7,18 @@ import org.slf4j.LoggerFactory;
 
 public class RerankRequest extends SampleRequest {
     Logger logger = LoggerFactory.getLogger(RerankRequest.class);
-    private String location;
-    private String term;
-    private String locationEncoded; // TODO: put in the getURL method remove other place
-    private String termEncoded;
+    private final String location; // required
+    private final String term; // required
 
-    public RerankRequest(String location, String term) {
-        this.location = location;
-        this.term = term;
-        this.locationEncoded = encode(location);
-        this.termEncoded = encode(term);
+    private RerankRequest(Builder builder) {
+        super();
+        this.location = builder.location;
+        this.term = builder.term;
     }
 
     @Override
     protected String generateUrl() {
-        return String.format("https://api.yelp.com/v3/businesses/search?location=%s&term=%s", locationEncoded, termEncoded);
+        return String.format("https://api.yelp.com/v3/businesses/search?location=%s&term=%s", encode(this.location), encode(this.term));
     }
 
     @Override
@@ -33,36 +30,28 @@ public class RerankRequest extends SampleRequest {
                 .build();
     }
 
-    public String getLocationEncoded() {
-        return locationEncoded;
-    }
-
-    public void setLocationEncoded(String locationEncoded) {
-        this.locationEncoded = locationEncoded;
-    }
-
-    public String getTermEncoded() {
-        return termEncoded;
-    }
-
-    public void setTermEncoded(String termEncoded) {
-        this.termEncoded = termEncoded;
-    }
-
     public String getLocation() {
         return location;
-    }
-
-    public void setLocation(String location) {
-        this.location = location;
     }
 
     public String getTerm() {
         return term;
     }
 
-    public void setTerm(String term) {
-        this.term = term;
+    public static class Builder extends SampleRequest.Builder {
+        private final String location;
+        private final String term;
+
+        public Builder(String location, String term) {
+            this.location = location;
+            this.term = term;
+        }
+
+        @Override
+        public RerankRequest build() {
+            RerankRequest rerankRequest = new RerankRequest(this);
+            return rerankRequest;
+        }
     }
 }
 

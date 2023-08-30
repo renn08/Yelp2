@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import static com.example.yelp.Utility.RerankUtil.reRankByRatingCount;
+
 public class RerankResponse extends SampleResponse {
     Logger logger = LoggerFactory.getLogger(RerankResponse.class);
 
@@ -17,15 +19,15 @@ public class RerankResponse extends SampleResponse {
     private Region region;
     private String searchLocation;
     private String searchTerm;
-    private List<Business> businesses = new ArrayList<>();
+    private List<Business> businesses;
 
     public RerankResponse(YelpSearchResponse yelpSearchResponse, RerankRequest request) {
         super(yelpSearchResponse);
-        this.businesses = yelpSearchResponse.getBusinesses();
+        this.businesses = new ArrayList<>(yelpSearchResponse.getBusinesses());
         this.region = yelpSearchResponse.getRegion();
         this.total = yelpSearchResponse.getTotal();
-        this.searchLocation = request.getLocationEncoded();
-        this.searchTerm = request.getTermEncoded();
+        this.searchLocation = request.encode(request.getLocation());
+        this.searchTerm = request.encode(request.getTerm());
     }
 
     public int getTotal() {
@@ -70,12 +72,6 @@ public class RerankResponse extends SampleResponse {
 
     /**re-rank the business by new ranking = rating * review_count, in desc order*/
     public void reRank() {
-        Collections.sort(this.businesses, (o1, o2) -> {
-            double newRank1 = o1.getRating() * o1.getReviewCount();
-            double newRank2 = o2.getRating() * o2.getReviewCount();
-            if (newRank2 > newRank1) return 1;
-            else if (newRank2 == newRank1) return 0;
-            else return -1;
-        });
+        reRankByRatingCount(this.businesses);
     }
 }

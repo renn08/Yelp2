@@ -33,7 +33,7 @@ public class YelpController {
     @GetMapping("/searchRerank")
     public ResponseEntity<RerankResponse> rerank(@RequestParam String location,
                                                  @RequestParam String term) {
-        RerankRequest request = new RerankRequest(location, term);
+        RerankRequest request = new RerankRequest.Builder(location, term).build();
 
         YelpSearchResponse yelpSearchResponse = getYelpResponse(request.generateRequest());
 
@@ -48,7 +48,7 @@ public class YelpController {
     @GetMapping("/searchGroupByCategory")
     public ResponseEntity<GroupByCategoryResponse> GroupByCategory(@RequestParam String location,
                                                                    @RequestParam String term) {
-        RerankRequest request = new RerankRequest(location, term);
+        RerankRequest request = new RerankRequest.Builder(location, term).build();
 
         YelpSearchResponse yelpSearchResponse = getYelpResponse(request.generateRequest());
 
@@ -63,7 +63,7 @@ public class YelpController {
     @GetMapping("/searchRerankFilterLocationCategory")
     public ResponseEntity<RerankFilterLocationCategoryResponse> rerankFilterLocationCategory(@RequestParam String location,
                                                                                              @RequestParam String categories) {
-        RerankFilterLocationCategoryRequest request = new RerankFilterLocationCategoryRequest(location, categories);
+        RerankFilterLocationCategoryRequest request = new RerankFilterLocationCategoryRequest.Builder(location, categories).build();
 
         YelpSearchResponse yelpSearchResponse = getYelpResponse(request.generateRequest());
 
