@@ -1,11 +1,10 @@
 package com.example.yelp.Controller;
 
-import com.example.yelp.Request.RerankFilterLocationCategoryRequest;
-import com.example.yelp.Request.RerankRequest;
-import com.example.yelp.Response.GroupByCategoryResponse;
-import com.example.yelp.Response.RerankFilterLocationCategoryResponse;
-import com.example.yelp.Response.RerankResponse;
-import com.example.yelp.Response.YelpSearchResponse;
+import com.example.yelp.Entity.Business;
+import com.example.yelp.Entity.BusinessesAndTotal;
+import com.example.yelp.Request.LocationCategoryRequest;
+import com.example.yelp.Request.LocationTermRequest;
+import com.example.yelp.Response.*;
 import org.apache.http.client.methods.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +19,13 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import static com.example.yelp.Utility.BusinessCategoryUtil.groupByCategoryAndAddTotal;
+import static com.example.yelp.Utility.RerankUtil.reRankByRatingCount;
+
 @RestController // (annotate in class to mark the controller class) - check source code in IntelliJ by holding “command” + click the function
 public class YelpController {
     Logger logger = LoggerFactory.getLogger(YelpController.class);
@@ -33,13 +39,25 @@ public class YelpController {
     @GetMapping("/searchRerank")
     public ResponseEntity<RerankResponse> rerank(@RequestParam String location,
                                                  @RequestParam String term) {
-        RerankRequest request = new RerankRequest.Builder(location, term).build();
+        LocationTermRequest request = LocationTermRequest.builder()
+                .setTerm(term)
+                .setLocation(location)
+                .build();
 
-        YelpSearchResponse yelpSearchResponse = getYelpResponse(request.generateRequest());
+        YelpSearchResponse yelpResponse = getYelpResponse(request.generateGetRequest());
 
-        RerankResponse serviceResponse = new RerankResponse(yelpSearchResponse, request);
+        List<Business> reRankBusinesses = new ArrayList<>(yelpResponse.getBusinesses());
 
-        serviceResponse.reRank();
+        reRankByRatingCount(reRankBusinesses);
+
+        RerankResponse serviceResponse = RerankResponse.builder()
+                .setStatusCode(yelpResponse.getStatusCode())
+                .setRegion(yelpResponse.getRegion())
+                .setTotal(yelpResponse.getTotal())
+                .setSearchLocation(request.encode(request.getLocation()))
+                .setSearchTerm(request.encode(request.getTerm()))
+                .setBusinesses(reRankBusinesses)
+                .build();
 
         // SampleResponse still has status code from Yelp API but for our service, default use .ok()
         return ResponseEntity.ok().body(serviceResponse);
@@ -48,14 +66,23 @@ public class YelpController {
     @GetMapping("/searchGroupByCategory")
     public ResponseEntity<GroupByCategoryResponse> GroupByCategory(@RequestParam String location,
                                                                    @RequestParam String term) {
-        RerankRequest request = new RerankRequest.Builder(location, term).build();
+        LocationTermRequest request = LocationTermRequest.builder()
+                .setTerm(term)
+                .setLocation(location)
+                .build();
 
-        YelpSearchResponse yelpSearchResponse = getYelpResponse(request.generateRequest());
+        YelpSearchResponse yelpResponse = getYelpResponse(request.generateGetRequest());
 
-        GroupByCategoryResponse serviceResponse = new GroupByCategoryResponse(yelpSearchResponse, request);
+        List<Business> businesses = yelpResponse.getBusinesses();
 
-        serviceResponse.groupByCategoryAndAddTotal();
-        serviceResponse.sortByTotal();
+        List<Map<String, BusinessesAndTotal>> bizAndTotalGroupByCat = groupByCategoryAndAddTotal(businesses);
+
+        GroupByCategoryResponse serviceResponse = GroupByCategoryResponse.builder()
+                .setStatusCode(yelpResponse.getStatusCode())
+                .setSearchLocation(request.encode(request.getLocation()))
+                .setSearchTerm(request.encode(request.getTerm()))
+                .setBizAndTotalGroupByCat(bizAndTotalGroupByCat)
+                .build();
 
         return ResponseEntity.ok().body(serviceResponse);
     }
@@ -63,13 +90,25 @@ public class YelpController {
     @GetMapping("/searchRerankFilterLocationCategory")
     public ResponseEntity<RerankFilterLocationCategoryResponse> rerankFilterLocationCategory(@RequestParam String location,
                                                                                              @RequestParam String categories) {
-        RerankFilterLocationCategoryRequest request = new RerankFilterLocationCategoryRequest.Builder(location, categories).build();
+        LocationCategoryRequest request = LocationCategoryRequest.builder()
+                .setCategory(categories)
+                .setLocation(location)
+                .build();
 
-        YelpSearchResponse yelpSearchResponse = getYelpResponse(request.generateRequest());
+        YelpSearchResponse yelpResponse = getYelpResponse(request.generateGetRequest());
 
-        RerankFilterLocationCategoryResponse serviceResponse = new RerankFilterLocationCategoryResponse(yelpSearchResponse, request);
+        List<Business> filteredBusinesses = yelpResponse.getBusinesses();
 
-        serviceResponse.reRank();
+        reRankByRatingCount(filteredBusinesses);
+
+        RerankFilterLocationCategoryResponse serviceResponse = RerankFilterLocationCategoryResponse.builder()
+                .setStatusCode(yelpResponse.getStatusCode())
+                .setSearchCategory(request.encode(request.getCategory()))
+                .setSearchLocation(request.encode(request.getLocation()))
+                .setRegion(yelpResponse.getRegion())
+                .setTotal(yelpResponse.getTotal())
+                .setBusinesses(filteredBusinesses)
+                .build();
 
         return ResponseEntity.ok().body(serviceResponse);
     }

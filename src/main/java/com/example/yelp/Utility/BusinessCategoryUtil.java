@@ -42,4 +42,31 @@ public final class BusinessCategoryUtil {
         });
         return businessesAndTotalGroupByCategoryList;
     }
+
+    public static List<Map<String, BusinessesAndTotal>> groupByCategoryAndAddTotal(List<Business> businesses) {
+        // a stream of single category business pairs
+        Stream<CategoryAndBusiness> catBizStream = toCatBizStream(businesses);
+
+        // group by category
+        Map<Category, List<Business>> groupedByCategory = groupByCategory(catBizStream);
+
+        // add total
+        List<Map<String, BusinessesAndTotal>> result = addTotal(groupedByCategory);
+
+        // sort by total
+        sortByTotal(result);
+
+        return result;
+    }
+
+    public static void sortByTotal(List<Map<String, BusinessesAndTotal>> list) {
+        list.sort((a, b) -> {
+            for (BusinessesAndTotal b1  : a.values()) {
+                for (BusinessesAndTotal b2 : b.values()) {
+                    return b2.getTotal() - b1.getTotal();
+                }
+            }
+            return 0;
+        });
+    }
 }

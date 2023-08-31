@@ -1,90 +1,70 @@
 package com.example.yelp.Response;
 
-import com.example.yelp.Entity.Business;
 import com.example.yelp.Entity.BusinessesAndTotal;
-import com.example.yelp.Entity.Category;
-import com.example.yelp.Entity.CategoryAndBusiness;
-import com.example.yelp.Request.RerankRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatusCode;
 
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import static com.example.yelp.Utility.BusinessCategoryUtil.*;
 
 public class GroupByCategoryResponse extends SampleResponse {
     Logger logger = LoggerFactory.getLogger(GroupByCategoryResponse.class);
 
-    private String searchTerm;
-    private String searchLocation;
-
-    private List<Business> businesses;
+    private final String searchTerm; // required
+    private final String searchLocation; // required
 
     // category alias name for the String in the map
-    private List<Map<String, BusinessesAndTotal>> businessesAndTotalGroupByCategoryList;
+    private final List<Map<String, BusinessesAndTotal>> bizAndTotalGroupByCat;
 
-    public GroupByCategoryResponse(YelpSearchResponse yelpSearchResponse, RerankRequest request) {
-        super(yelpSearchResponse);
-        this.searchLocation = request.encode(request.getLocation());
-        this.searchTerm = request.encode(request.getTerm());
-        this.businessesAndTotalGroupByCategoryList = new ArrayList<>();
-        this.businesses = new ArrayList<>();
-        this.businesses = yelpSearchResponse.getBusinesses();
+    private GroupByCategoryResponse(HttpStatusCode statusCode, String searchLocation, String searchTerm, List<Map<String, BusinessesAndTotal>>  bizAndTotalGroupByCat) {
+        super(statusCode);
+        this.searchLocation = searchLocation;
+        this.searchTerm = searchTerm;
+        this.bizAndTotalGroupByCat = bizAndTotalGroupByCat;
     }
 
     public String getSearchTerm() {
         return searchTerm;
     }
 
-    public void setSearchTerm(String searchTerm) {
-        this.searchTerm = searchTerm;
-    }
-
     public String getSearchLocation() {
         return searchLocation;
     }
 
-    public void setSearchLocation(String searchLocation) {
-        this.searchLocation = searchLocation;
+    public List<Map<String, BusinessesAndTotal>> getBizAndTotalGroupByCat() {
+        return bizAndTotalGroupByCat;
     }
 
-    public List<Business> getBusinesses() {
-        return businesses;
+    public static Builder builder() {
+        return new Builder();
     }
 
-    public void setBusinesses(List<Business> businesses) {
-        this.businesses = businesses;
-    }
+    public static class Builder extends SampleResponse.Builder<Builder> {
+        private String searchTerm;
+        private String searchLocation;
 
-    public List<Map<String, BusinessesAndTotal>> getBusinessesAndTotalGroupByCategoryList() {
-        return businessesAndTotalGroupByCategoryList;
-    }
+        private List<Map<String, BusinessesAndTotal>> bizAndTotalGroupByCat;
 
-    public void setBusinessesAndTotalGroupByCategoryList(List<Map<String, BusinessesAndTotal>> businessesAndTotalGroupByCategoryList) {
-        this.businessesAndTotalGroupByCategoryList = businessesAndTotalGroupByCategoryList;
-    }
+        public Builder() {}
 
-    public void groupByCategoryAndAddTotal() {
-        // a stream of single category business pairs
-        Stream<CategoryAndBusiness> catBizStream = toCatBizStream(this.businesses);
+        public Builder setBizAndTotalGroupByCat (List<Map<String, BusinessesAndTotal>> bizAndTotalGroupByCat) {
+            this.bizAndTotalGroupByCat = bizAndTotalGroupByCat;
+            return this;
+        }
 
-        // group by category
-        Map<Category, List<Business>> groupedByCategory = groupByCategory(catBizStream);
+        public Builder setSearchLocation(String searchLocation) {
+            this.searchLocation = searchLocation;
+            return this;
+        }
 
-        // add total
-        this.businessesAndTotalGroupByCategoryList = addTotal(groupedByCategory);
-    }
+        public Builder setSearchTerm(String searchTerm) {
+            this.searchTerm = searchTerm;
+            return this;
+        }
 
-    public void sortByTotal() {
-        businessesAndTotalGroupByCategoryList.sort((a, b) -> {
-            for (BusinessesAndTotal b1  : a.values()) {
-                for (BusinessesAndTotal b2 : b.values()) {
-                    return b2.getTotal() - b1.getTotal();
-                }
-            }
-            return 0;
-        });
+        @Override
+        public GroupByCategoryResponse build() {
+            return new GroupByCategoryResponse(statusCode, searchLocation, searchTerm, bizAndTotalGroupByCat);
+        }
     }
 }

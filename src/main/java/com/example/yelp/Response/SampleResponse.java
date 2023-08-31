@@ -1,11 +1,15 @@
 package com.example.yelp.Response;
 
+import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatusCode;
 
 public class SampleResponse {
-    protected HttpStatusCode statusCode;
+    private final HttpStatusCode statusCode;
 
-    public SampleResponse() {}
+    protected SampleResponse(HttpStatusCode statusCode) {
+        this.statusCode = statusCode;
+    }
+
     public SampleResponse(YelpSearchResponse yelpSearchResponse) {
         this.statusCode = yelpSearchResponse.getStatusCode();
     }
@@ -14,7 +18,23 @@ public class SampleResponse {
         return statusCode;
     }
 
-    public void setStatusCode(HttpStatusCode statusCode) {
-        this.statusCode = statusCode;
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    // use generic type
+    public static class Builder<S extends Builder> {
+        protected HttpStatusCode statusCode;
+
+        public Builder() {}
+
+        public S setStatusCode(HttpStatusCode statusCode) {
+            this.statusCode = statusCode;
+            return (S) this;
+        }
+
+        public SampleResponse build() {
+            return new SampleResponse(statusCode);
+        }
     }
 }
