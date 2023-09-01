@@ -3,7 +3,6 @@ package com.example.yelp.Response;
 import com.example.yelp.Entity.BusinessesAndTotal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatusCode;
 
 import java.util.*;
 
@@ -16,8 +15,8 @@ public class GroupByCategoryResponse extends SampleResponse {
     // category alias name for the String in the map
     private final List<Map<String, BusinessesAndTotal>> bizAndTotalGroupByCat;
 
-    private GroupByCategoryResponse(HttpStatusCode statusCode, String searchLocation, String searchTerm, List<Map<String, BusinessesAndTotal>>  bizAndTotalGroupByCat) {
-        super(statusCode);
+    private GroupByCategoryResponse(String searchLocation, String searchTerm, List<Map<String, BusinessesAndTotal>>  bizAndTotalGroupByCat) {
+        super();
         this.searchLocation = searchLocation;
         this.searchTerm = searchTerm;
         this.bizAndTotalGroupByCat = bizAndTotalGroupByCat;
@@ -64,7 +63,7 @@ public class GroupByCategoryResponse extends SampleResponse {
 
         @Override
         public GroupByCategoryResponse build() {
-            return new GroupByCategoryResponse(statusCode, searchLocation, searchTerm, bizAndTotalGroupByCat);
+            return new GroupByCategoryResponse(searchLocation, searchTerm, bizAndTotalGroupByCat);
         }
     }
 }

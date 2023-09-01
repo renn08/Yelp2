@@ -2,7 +2,6 @@ package com.example.yelp.Response;
 
 import com.example.yelp.Entity.Business;
 import com.example.yelp.Entity.Region;
-import org.springframework.http.HttpStatusCode;
 
 import java.util.List;
 
@@ -15,15 +14,14 @@ public class RerankFilterLocationCategoryResponse extends SampleResponse {
     private final String searchLocation; // required
     private final List<Business> businesses; // required
 
-    public RerankFilterLocationCategoryResponse(HttpStatusCode statusCode, List<Business> businesses, Region region, int total, String searchLocation, String searchCategory) {
-        super(statusCode);
+    public RerankFilterLocationCategoryResponse(List<Business> businesses, Region region, int total, String searchLocation, String searchCategory) {
+        super();
         this.businesses = businesses;
         this.region = region;
         this.total = total;
         this.searchLocation = searchLocation;
         this.searchCategory = searchCategory;
     }
-
 
     public String getSearchCategory() {
         return searchCategory;
@@ -93,7 +91,7 @@ public class RerankFilterLocationCategoryResponse extends SampleResponse {
 
         @Override
         public RerankFilterLocationCategoryResponse build() {
-            return new RerankFilterLocationCategoryResponse(statusCode, businesses, region, total, searchLocation, searchCategory);
+            return new RerankFilterLocationCategoryResponse(businesses, region, total, searchLocation, searchCategory);
         }
     }
 }

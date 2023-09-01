@@ -1,10 +1,10 @@
 package com.example.yelp.Entity;
 
 public class CategoryAndBusiness {
-    private Category category;
-    private Business business;
+    private final Category category;
+    private final Business business;
 
-    public CategoryAndBusiness(Category category, Business business) {
+    private CategoryAndBusiness(Category category, Business business) {
         this.category = category;
         this.business = business;
     }
@@ -13,15 +13,32 @@ public class CategoryAndBusiness {
         return category;
     }
 
-    public void setCategory(Category category) {
-        this.category = category;
-    }
-
     public Business getBusiness() {
         return business;
     }
 
-    public void setBusiness(Business business) {
-        this.business = business;
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public static class Builder {
+        private Category category;
+        private Business business;
+
+        public Builder() {}
+
+        public Builder category(Category category) {
+            this.category = category;
+            return this;
+        }
+
+        public Builder business(Business business) {
+            this.business = business;
+            return this;
+        }
+
+        public CategoryAndBusiness build() {
+            return new CategoryAndBusiness(category, business);
+        }
     }
 }

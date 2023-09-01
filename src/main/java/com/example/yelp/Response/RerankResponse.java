@@ -4,7 +4,6 @@ import com.example.yelp.Entity.Business;
 import com.example.yelp.Entity.Region;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatusCode;
 
 import java.util.List;
 
@@ -17,8 +16,8 @@ public class RerankResponse extends SampleResponse {
     private final String searchTerm;
     private final List<Business> businesses;
 
-    public RerankResponse(HttpStatusCode statusCode, List<Business> businesses, Region region, int total, String searchLocation, String searchTerm) {
-        super(statusCode);
+    public RerankResponse(List<Business> businesses, Region region, int total, String searchLocation, String searchTerm) {
+        super();
         this.businesses = businesses;
         this.region = region;
         this.total = total;
@@ -85,7 +84,7 @@ public class RerankResponse extends SampleResponse {
 
         @Override
         public RerankResponse build() {
-            return new RerankResponse(statusCode, businesses, region, total, searchLocation, searchTerm);
+            return new RerankResponse(businesses, region, total, searchLocation, searchTerm);
         }
     }
 }

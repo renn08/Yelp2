@@ -9,63 +9,77 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatusCode;
 
+@JsonDeserialize(builder = YelpSearchResponse.Builder.class)
 public class YelpSearchResponse {
     Logger logger = LoggerFactory.getLogger(YelpSearchResponse.class);
 
-    @JsonProperty("status_code")
-    HttpStatusCode statusCode = HttpStatusCode.valueOf(500);
     @JsonProperty("total")
-    private int total;
+    private final int total;
 
     @JsonProperty("region")
-    private Region region;
+    private final Region region;
 
     @JsonProperty("businesses")
-    private List<Business> businesses = new ArrayList<>();
+    private final List<Business> businesses;
 
-    public YelpSearchResponse() {}
-    public YelpSearchResponse(String searchResult) throws JsonProcessingException {
-        ObjectMapper objectMapper = new ObjectMapper();
-        YelpSearchResponse response = objectMapper.readValue(searchResult, YelpSearchResponse.class);
-        this.businesses = response.businesses;
-        this.region = response.region;
-        this.total = response.total;
-        logger.info("Business List: " + businesses);
-    }
-
-    public HttpStatusCode getStatusCode() {
-        return statusCode;
-    }
-
-    public void setStatusCode(HttpStatusCode statusCode) {
-        this.statusCode = statusCode;
+    private YelpSearchResponse(List<Business> businesses, Region region, int total) {
+        this.businesses = businesses;
+        this.region = region;
+        this.total = total;
     }
 
     public int getTotal() {
         return total;
     }
 
-    public void setTotal(int total) {
-        this.total = total;
-    }
-
     public Region getRegion() {
         return region;
-    }
-
-    public void setRegion(Region region) {
-        this.region = region;
     }
 
     public List<Business> getBusinesses() {
         return businesses;
     }
 
-    public void setBusinesses(List<Business> businesses) {
-        this.businesses = businesses;
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    @JsonPOJOBuilder(withPrefix = "")
+    public static class Builder {
+        @JsonProperty("total")
+        private int total;
+
+        @JsonProperty("region")
+        private Region region;
+
+        @JsonProperty("businesses")
+        private List<Business> businesses;
+
+        public Builder() {}
+
+        public Builder total(int total) {
+            this.total = total;
+            return this;
+        }
+
+        public Builder region(Region region) {
+            this.region = region;
+            return this;
+        }
+
+        public Builder businesses(List<Business> businesses) {
+            this.businesses = businesses;
+            return this;
+        }
+
+        public YelpSearchResponse build() {
+            return new YelpSearchResponse(businesses, region, total);
+        }
+
     }
 }

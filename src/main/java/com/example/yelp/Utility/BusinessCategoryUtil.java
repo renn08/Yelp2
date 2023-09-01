@@ -21,7 +21,9 @@ public final class BusinessCategoryUtil {
                 .stream()
                 .flatMap(eachBusiness -> eachBusiness.getCategories()
                         .stream()
-                        .map(category -> new CategoryAndBusiness(category, eachBusiness)));
+                        .map(category -> CategoryAndBusiness.builder()
+                                .category(category).business(eachBusiness)
+                                .build()));
     }
 
     // map a stream of category and business objects into a map that group businesses by category into list
@@ -37,7 +39,9 @@ public final class BusinessCategoryUtil {
         groupedByCategory.forEach((category, businessList) -> {
             int totalCount = businessList.size();
             Map<String, BusinessesAndTotal> map = new HashMap<>();
-            map.put(category.getAlias(), new BusinessesAndTotal(totalCount, new ArrayList<>(businessList)));
+            map.put(category.getAlias(), BusinessesAndTotal.builder()
+                    .total(totalCount).businesses(new ArrayList<>(businessList))
+                    .build());
             businessesAndTotalGroupByCategoryList.add(map);
         });
         return businessesAndTotalGroupByCategoryList;

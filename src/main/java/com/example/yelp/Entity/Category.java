@@ -3,16 +3,17 @@ package com.example.yelp.Entity;
 import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 
+@JsonDeserialize(builder = Category.Builder.class)
 public class Category {
     @JsonProperty("alias")
-    private String alias;
+    private final String alias;
     @JsonProperty("title")
-    private String title;
+    private final String title;
 
-    public Category() {}
-
-    public Category(String alias, String title) {
+    private Category(String alias, String title) {
         this.alias = alias;
         this.title = title;
     }
@@ -25,12 +26,32 @@ public class Category {
         return title;
     }
 
-    public void setAlias(String alias) {
-        this.alias = alias;
+    public static Builder builder() {
+        return new Builder();
     }
 
-    public void setTitle(String title) {
-        this.title = title;
+    @JsonPOJOBuilder(withPrefix = "")
+    public static class Builder {
+        @JsonProperty("alias")
+        private String alias;
+        @JsonProperty("title")
+        private String title;
+
+        public Builder() {}
+
+        public Builder alias(String alias) {
+            this.alias = alias;
+            return this;
+        }
+
+        public Builder title(String title) {
+            this.title = title;
+            return this;
+        }
+
+        public Category build() {
+            return new Category(alias, title);
+        }
     }
 
     @Override
@@ -38,15 +59,11 @@ public class Category {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Category category = (Category) o;
-        return
-//                Objects.equals(title, category.title) && //TODO: not sure can we just use alias to do hash and equals
-                Objects.equals(alias, category.alias);
-
+        return Objects.equals(alias, category.alias);
     }
 
     @Override
     public int hashCode() {
-//        return Objects.hash(alias, title);
         return Objects.hash(alias);
     }
 }

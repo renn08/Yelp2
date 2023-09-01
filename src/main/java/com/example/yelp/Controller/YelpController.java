@@ -5,10 +5,11 @@ import com.example.yelp.Entity.BusinessesAndTotal;
 import com.example.yelp.Request.LocationCategoryRequest;
 import com.example.yelp.Request.LocationTermRequest;
 import com.example.yelp.Response.*;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.http.client.methods.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -19,12 +20,14 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import static com.example.yelp.Utility.BusinessCategoryUtil.groupByCategoryAndAddTotal;
 import static com.example.yelp.Utility.RerankUtil.reRankByRatingCount;
+import static com.example.yelp.Utility.YelpResponseUtil.getYelpResponse;
 
 @RestController // (annotate in class to mark the controller class) - check source code in IntelliJ by holding “command” + click the function
 public class YelpController {
@@ -51,7 +54,6 @@ public class YelpController {
         reRankByRatingCount(reRankBusinesses);
 
         RerankResponse serviceResponse = RerankResponse.builder()
-                .setStatusCode(yelpResponse.getStatusCode())
                 .setRegion(yelpResponse.getRegion())
                 .setTotal(yelpResponse.getTotal())
                 .setSearchLocation(request.encode(request.getLocation()))
@@ -78,7 +80,6 @@ public class YelpController {
         List<Map<String, BusinessesAndTotal>> bizAndTotalGroupByCat = groupByCategoryAndAddTotal(businesses);
 
         GroupByCategoryResponse serviceResponse = GroupByCategoryResponse.builder()
-                .setStatusCode(yelpResponse.getStatusCode())
                 .setSearchLocation(request.encode(request.getLocation()))
                 .setSearchTerm(request.encode(request.getTerm()))
                 .setBizAndTotalGroupByCat(bizAndTotalGroupByCat)
@@ -102,7 +103,6 @@ public class YelpController {
         reRankByRatingCount(filteredBusinesses);
 
         RerankFilterLocationCategoryResponse serviceResponse = RerankFilterLocationCategoryResponse.builder()
-                .setStatusCode(yelpResponse.getStatusCode())
                 .setSearchCategory(request.encode(request.getCategory()))
                 .setSearchLocation(request.encode(request.getLocation()))
                 .setRegion(yelpResponse.getRegion())
@@ -111,28 +111,6 @@ public class YelpController {
                 .build();
 
         return ResponseEntity.ok().body(serviceResponse);
-    }
-
-    private YelpSearchResponse getYelpResponse(HttpUriRequest httpRequest) {
-
-        CloseableHttpClient httpClient = HttpClients.createDefault();
-
-        YelpSearchResponse yelpSearchResponse = new YelpSearchResponse();
-
-        try (CloseableHttpResponse response = httpClient.execute(httpRequest)) {
-            HttpEntity entity = response.getEntity();
-            if (entity != null) {
-                String result = EntityUtils.toString(entity);
-                yelpSearchResponse = new YelpSearchResponse(result);
-            }
-            // now still has status code in the raw response body, but will not be used as our service response status
-            // code, default use .ok(). builder pattern
-            yelpSearchResponse.setStatusCode(HttpStatusCode.valueOf(response.getStatusLine().getStatusCode()));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return yelpSearchResponse;
     }
 }
 
