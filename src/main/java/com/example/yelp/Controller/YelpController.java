@@ -27,6 +27,7 @@ import java.util.Map;
 
 import static com.example.yelp.Utility.BusinessCategoryUtil.groupByCategoryAndAddTotal;
 import static com.example.yelp.Utility.RerankUtil.reRankByRatingCount;
+import static com.example.yelp.Utility.YelpResponseUtil.OBJECT_MAPPER;
 import static com.example.yelp.Utility.YelpResponseUtil.getYelpResponse;
 
 @RestController // (annotate in class to mark the controller class) - check source code in IntelliJ by holding “command” + click the function
