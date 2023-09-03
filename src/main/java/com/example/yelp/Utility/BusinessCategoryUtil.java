@@ -4,6 +4,7 @@ import com.example.yelp.Entity.Business;
 import com.example.yelp.Entity.BusinessesAndTotal;
 import com.example.yelp.Entity.Category;
 import com.example.yelp.Entity.CategoryAndBusiness;
+import com.example.yelp.Entity.CatAndBizId;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -24,6 +25,17 @@ public final class BusinessCategoryUtil {
                         .map(category -> CategoryAndBusiness.builder()
                                 .category(category).business(eachBusiness)
                                 .build()));
+    }
+
+    public static Stream<CatAndBizId> toCatAliasBizIdStream(@NotNull List<Business> businesses) {
+        return businesses
+                .stream()
+                .flatMap(eachBusiness -> eachBusiness.getCategories()
+                        .stream()
+                        .map(category -> CatAndBizId.builder()
+                                .category(category).businessId(eachBusiness.getId())
+                                .build()));
+
     }
 
     // map a stream of category and business objects into a map that group businesses by category into list

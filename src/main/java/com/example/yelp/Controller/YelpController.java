@@ -1,13 +1,9 @@
 package com.example.yelp.Controller;
 
-import com.example.yelp.Entity.Business;
-import com.example.yelp.Entity.BusinessesAndTotal;
+import com.example.yelp.Entity.*;
 import com.example.yelp.Request.LocationCategoryRequest;
 import com.example.yelp.Request.LocationTermRequest;
 import com.example.yelp.Response.*;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.http.client.methods.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -15,19 +11,14 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
-
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
-import static com.example.yelp.Utility.BusinessCategoryUtil.groupByCategoryAndAddTotal;
+import static com.example.yelp.Utility.BusinessCategoryUtil.*;
+import static com.example.yelp.Utility.DatabaseOperationUtil.*;
 import static com.example.yelp.Utility.RerankUtil.reRankByRatingCount;
-import static com.example.yelp.Utility.YelpResponseUtil.OBJECT_MAPPER;
 import static com.example.yelp.Utility.YelpResponseUtil.getYelpResponse;
 
 @RestController // (annotate in class to mark the controller class) - check source code in IntelliJ by holding “command” + click the function
@@ -112,6 +103,32 @@ public class YelpController {
                 .build();
 
         return ResponseEntity.ok().body(serviceResponse);
+    }
+
+    @GetMapping("/insertDbLocationTerm")
+    public void insertDbLocationTerm(@RequestParam String location, @RequestParam String term) {
+        LocationTermRequest request = LocationTermRequest.builder()
+                .setTerm(term)
+                .setLocation(location)
+                .build();
+
+        YelpSearchResponse yelpResponse = getYelpResponse(request.generateGetRequest());
+
+        List<Business> businesses = yelpResponse.getBusinesses();
+
+        Stream<CatAndBizId> st = toCatAliasBizIdStream(businesses);
+
+        // insert into business table
+        for (Business i : businesses) {
+            insertBizNonDup(i.getId(), i.getAlias(), i.getName(), i.getImageUrl(), i.isClosed(), i.getUrl(),
+                    i.getReviewCount(), i.getRating(), i.getPrice(), i.getPhone(), i.getDisplayPhone(), i.getDistance());
+        }
+
+        // insert into category table and business category table
+        st.forEach((catAndBizId)->{
+            insertCatNonDup(catAndBizId.getCategory().getAlias(), catAndBizId.getCategory().getTitle());
+            insertBizCatNonDup(catAndBizId.getBusinessId(), catAndBizId.getCategory().getAlias());
+        });
     }
 }
 
