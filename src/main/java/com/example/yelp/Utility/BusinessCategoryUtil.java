@@ -38,6 +38,14 @@ public final class BusinessCategoryUtil {
 
     }
 
+    public static Stream<CatAndBizId> toCatAliasBizIdStreamSingle(@NotNull Business business) {
+        return business.getCategories()
+                        .stream()
+                        .map(category -> CatAndBizId.builder()
+                                .category(category).businessId(business.getId())
+                                .build());
+    }
+
     // map a stream of category and business objects into a map that group businesses by category into list
     public static Map<Category, List<Business>> groupByCategory(@NotNull Stream<CategoryAndBusiness> catBizStream) {
         return catBizStream

@@ -6,11 +6,12 @@ import com.example.yelp.Request.LocationTermRequest;
 import com.example.yelp.Response.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.web.bind.annotation.*;
 
+import javax.sql.DataSource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -23,6 +24,7 @@ import static com.example.yelp.Utility.YelpResponseUtil.getYelpResponse;
 
 @RestController // (annotate in class to mark the controller class) - check source code in IntelliJ by holding “command” + click the function
 public class YelpController {
+
     Logger logger = LoggerFactory.getLogger(YelpController.class);
 
     @GetMapping("/") //define API name
@@ -119,15 +121,41 @@ public class YelpController {
         Stream<CatAndBizId> st = toCatAliasBizIdStream(businesses);
 
         // insert into business table
-        for (Business i : businesses) {
-            insertBizNonDup(i.getId(), i.getAlias(), i.getName(), i.getImageUrl(), i.isClosed(), i.getUrl(),
-                    i.getReviewCount(), i.getRating(), i.getPrice(), i.getPhone(), i.getDisplayPhone(), i.getDistance());
-        }
 
-        // insert into category table and business category table
+
+//        for (Business i: businesses) insertBizNonDup(i);
+//        st.forEach((catAndBizId)->{
+//            insertCatNonDup(catAndBizId.getCategory());
+//            insertBizCatNonDup(catAndBizId);
+//        });
+
+        // batch or single? TODO:
+        insertBizNonDupBatch(businesses);
+
+        List<Category> cats = new ArrayList<>();
+        List<CatAndBizId> catAndBizIds = new ArrayList<>();
         st.forEach((catAndBizId)->{
-            insertCatNonDup(catAndBizId.getCategory().getAlias(), catAndBizId.getCategory().getTitle());
-            insertBizCatNonDup(catAndBizId.getBusinessId(), catAndBizId.getCategory().getAlias());
+            cats.add(catAndBizId.getCategory());
+            catAndBizIds.add(catAndBizId);
+        });
+
+        insertCatNonDupBatch(cats);
+        insertBizCatNonDupBatch(catAndBizIds);
+    }
+
+
+    // Sample curl:
+    // curl -X POST -d "{\"id\":\"sample_id\",\"price\":\"$\",\"categories\":[{\"alias\":\"sample_alias\", \"title\":\"sample_title\"}]}" -H "Content-Type: application/json" localhost:8080/insertDbBusiness
+    @PostMapping("/insertDbBusiness")
+    public void insertDbBusiness(@RequestBody Business business) {
+
+        Stream<CatAndBizId> st = toCatAliasBizIdStreamSingle(business);
+
+        // insert into business table
+        insertBizNonDup(business);
+        st.forEach((catAndBizId)->{
+            insertCatNonDup(catAndBizId.getCategory());
+            insertBizCatNonDup(catAndBizId);
         });
     }
 }
