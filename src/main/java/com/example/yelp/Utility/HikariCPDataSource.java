@@ -3,6 +3,7 @@ package com.example.yelp.Utility;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
+import javax.xml.crypto.Data;
 import java.sql.Connection;
 import java.sql.SQLException;
 
@@ -11,9 +12,10 @@ public class HikariCPDataSource {
     private static HikariDataSource ds;
 
     static {
-        config.setJdbcUrl("jdbc:mysql://127.0.0.1:3306/yelpDB");
-        config.setUsername("root");
-        config.setPassword("nopassword");
+        config.setJdbcUrl(DatabaseOperationUtil.dbUrl);
+        config.setUsername(DatabaseOperationUtil.user);
+        config.setPassword(DatabaseOperationUtil.password);
+        config.setDriverClassName(DatabaseOperationUtil.className);
         config.addDataSourceProperty("cachePrepStmts", "true");
         config.addDataSourceProperty("prepStmtCacheSize", "250");
         config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
